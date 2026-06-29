@@ -1,24 +1,17 @@
-# Kelime Kartları - Backend & API (Django)
+# Kelime Kartı - Backend & API (Django)
 
-Bu proje, "Kelime kartları" mobil uygulamasının veri tabanı yönetimini ve istemci-sunucu haberleşmesini sağlayan arka uç (backend) sistemidir. İstemci (Flutter) tarafına JSON formatında veri sunan RESTful API uç noktaları içerir.
+Bu modül, kelime öğrenme uygulamasının veritabanı yönetimini, aralıklı tekrar algoritmasını ve mobil istemci (Flutter) ile haberleşmesini sağlayan RESTful API sistemidir.
 
-## Kullanılan Teknolojiler
-* **Backend Framework:** Python / Django
-* **API Mimarisi:** Django REST Framework (DRF)
-* **Veri Tabanı:** SQLite
-* **İlişkisel Veri Modelleri:** One-to-Many (Liste ve Kelime ilişkisi)
+## Öne Çıkan Özellikler ve Algoritma
 
-## API Uç Noktaları (Endpoints)
-Mobil uygulamanın kullandığı temel API yolları şunlardır:
-* `GET /api/listeler/` - Tüm kelime listelerini getirir.
-* `POST /api/liste_ekle/` - Yeni bir liste oluşturur.
-* `GET /api/kelimeler/` - Listeye ait kelimeleri JSON olarak döner.
-* `POST /api/kelime_ekle/` - Sisteme yeni kelime kaydeder.
-* `POST /api/kelime_sil/<id>/` - Belirtilen kelimeyi veri tabanından siler.
+- **Aralıklı Tekrar (Spaced Repetition) Algoritması:** Backend tarafında her kelime modeline bir `level` (seviye) ve `next_review_date` (bir sonraki gösterim tarihi) alanı atanmıştır. Quiz esnasındaki başarı durumuna göre kelimenin seviyesi artırılarak bir sonraki gösterim tarihi katlanarak ileriye ötelenir; yanlış bilindiğinde ise süreç sıfırlanır.
+- **Veri Modellemesi:** `List` (Liste) ve `Word` (Kelime) modelleri arasında One-to-Many ilişkisi kurulmuş, `on_delete=CASCADE` yapısı ile veri bütünlüğü güvenceye alınmıştır.
+- **Dinamik JSON Çıktısı:** Mobil uygulamanın verileri hızlıca işleyebilmesi için Django REST Framework (DRF) serializers yapıları kullanılmıştır.
 
-## Mimari Notlar
-* Veri tabanında `List` ve `Word` olmak üzere iki temel model kullanılmış olup, `on_delete=CASCADE` yapısı ile veri bütünlüğü sağlanmıştır.
-* Dışa açık API yapısı oluşturulurken `serializers` köprüleri kullanılmıştır.
+## Temel API Uç Noktaları (Endpoints)
 
----
-*Not: Bu uygulamanın mobil arayüz (frontend) kodlarına ve tasarım detaylarına Flutter Depomdan ulaşabilirsiniz.*
+- `GET /api/listeler/` - Tüm kelime listelerini ve istatistikleri getirir.
+- `GET /api/kelimeler/` - Filtrelenmiş veya tüm kelime listesini JSON olarak döner.
+- `POST /api/kelime/ekle/` - Veritabanına yeni bir kelime kaydeder.
+- `POST /api/kelime/{id}/guncelle/` - Kelimenin seviyesini ve bir sonraki gösterim tarihini günceller.
+- `POST /api/kelime/{id}/sil/` - Belirtilen kelimeyi veritabanından siler.
