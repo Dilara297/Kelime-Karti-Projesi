@@ -1,0 +1,167 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <!-- basic -->
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <!-- site metas -->
+      <title>{{ liste.name }} - Kelimeler</title>
+      <meta name="keywords" content="">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <!-- bootstrap css -->
+      <link rel="stylesheet" type="text/css" href="{% static 'kelimeler/css/bootstrap.min.css' %}">
+      <!-- style css -->
+      <link rel="stylesheet" type="text/css" href="{% static 'kelimeler/css/style.css' %}">
+      <!-- Responsive-->
+      <link rel="stylesheet" href="{% static 'kelimeler/css/responsive.css' %}">
+      <!-- fevicon -->
+      <link rel="icon" href="{% static 'kelimeler/images/fevicon.png' %}" type="image/gif" />
+      <!-- Scrollbar Custom CSS -->
+      <link rel="stylesheet" href="{% static 'kelimeler/css/jquery.mCustomScrollbar.min.css' %}">
+      <!-- Tweaks for older IEs-->
+      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+      <!-- owl stylesheets --> 
+      <link rel="stylesheet" href="{% static 'kelimeler/css/owl.carousel.min.css' %}">
+      <link rel="stylesheet" href="{% static 'kelimeler/css/owl.theme.default.min.css' %}">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+   </head>
+   <body>
+      <!--header section start -->
+      <div class="header_section header_bg">
+         <div class="">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+               <div class="logo"><a href="{% url 'liste_gorunumu' %}"><img src="{% static 'kelimeler/images/logo.png' %}"></a></div>
+               <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+               <span class="navbar-toggler-icon"></span>
+               </button>
+               <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                  <ul class="navbar-nav mr-auto">
+                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'liste_gorunumu' %}">Home</a>
+                     </li>
+                     <li class="nav-item active">
+                        <a class="nav-link" href="#">{{ liste.name }}</a>
+                     </li>
+                  </ul>
+                  <form class="form-inline my-2 my-lg-0">
+                     <div class="login_text"><a href="#">Login</a></div>
+                     <div class="search_icon"><a href="#"><img src="{% static 'kelimeler/images/search-icon.png' %}"></a></div>
+                  </form>
+               </div>
+            </nav>
+         </div>
+      </div>
+      <!--header section end -->
+
+     <!--kelimeler section start -->
+<div class="language_section layout_padding">
+   <div class="container">
+      <h1 class="language_taital">{{ liste.name }}</h1>
+      <h1 class="language_taital_1">Listedeki Kelimeler</h1>
+      <div class="language_section_2 layout_padding">
+         <div class="row">
+            {% for kelime in kelimeler %}
+            <div class="col-lg-4 col-sm-6">
+               <div class="box_main" data-kelime-id="{{ kelime.id }}">
+                  <h6 class="heavy_text">{{ kelime.eng }} <br>{{ kelime.tr }}</h6>
+                  <p style="color:#fff; padding-top:10px;">{{ kelime.example }}</p>
+
+                  <p class="durum-yazisi" style="font-weight:bold; {% if kelime.known %}color:darkgreen;{% else %}color:darkred;{% endif %}">
+                     {% if kelime.known %}✓ Biliniyor{% else %}✗ Öğrenilecek{% endif %}
+                  </p>
+
+                  <button class="btn btn-sm btn-success biliyorum-bt" type="button">Biliyorum</button>
+                  <button class="btn btn-sm btn-danger bilmiyorum-bt" type="button">Bilmiyorum</button>
+               </div>
+            </div>
+            {% endfor %}
+         </div>
+      </div>
+      <div class="read_bt"><a href="{% url 'liste_gorunumu' %}">Geri Dön</a></div>
+   </div>
+</div>
+      <!--kelimeler section end -->
+      <!--copyright section start -->
+      <p class="copyright_text">
+   Kelime Defterim - Django & DRF ile geliştirildi.
+</p>
+      <!--copyright section end -->
+      <!-- Javascript files-->
+      <script src="{% static 'kelimeler/js/jquery.min.js' %}"></script>
+      <script src="{% static 'kelimeler/js/popper.min.js' %}"></script>
+      <script src="{% static 'kelimeler/js/bootstrap.bundle.min.js' %}"></script>
+      <script src="{% static 'kelimeler/js/jquery-3.0.0.min.js' %}"></script>
+      <script src="{% static 'kelimeler/js/plugin.js' %}"></script>
+      <!-- sidebar -->
+      <script src="{% static 'kelimeler/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+      <script src="{% static 'kelimeler/js/custom.js' %}"></script>
+      <!-- javascript --> 
+      <script src="{% static 'kelimeler/js/owl.carousel.js' %}"></script>
+      <script src="https:cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+      <script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function kelimeyiGuncelle(kelimeId, biliniyorMu, kartElementi) {
+        fetch('/api/kelime/' + kelimeId + '/guncelle/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ known: biliniyorMu })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const durumYazisi = kartElementi.querySelector('.durum-yazisi');
+            if (data.known) {
+                durumYazisi.textContent = '✓ Biliniyor';
+                durumYazisi.style.color = 'darkgreen';
+            } else {
+                durumYazisi.textContent = '✗ Öğrenilecek';
+                durumYazisi.style.color = 'darkred';
+            }
+        })
+        .catch(error => {
+            console.error('Hata oluştu:', error);
+        });
+    }
+
+    document.querySelectorAll('.biliyorum-bt').forEach(function (buton) {
+        buton.addEventListener('click', function () {
+            const kart = buton.closest('.box_main');
+            const kelimeId = kart.getAttribute('data-kelime-id');
+            kelimeyiGuncelle(kelimeId, true, kart);
+        });
+    });
+
+    document.querySelectorAll('.bilmiyorum-bt').forEach(function (buton) {
+        buton.addEventListener('click', function () {
+            const kart = buton.closest('.box_main');
+            const kelimeId = kart.getAttribute('data-kelime-id');
+            kelimeyiGuncelle(kelimeId, false, kart);
+        });
+    });
+
+});
+</script>
+   </body>
+</html>
