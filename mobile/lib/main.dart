@@ -66,6 +66,20 @@ class AnaSayfa extends StatefulWidget {
 }
 
 class _AnaSayfaState extends State<AnaSayfa> {
+  late Future<List<Map<String, dynamic>>> _listelerFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _listelerFuture = listeleriGetir();
+  }
+
+  void _sayfayiYenile() {
+    setState(() {
+      _listelerFuture = listeleriGetir();
+    });
+  }
+
   // yeni liste eklemek için dialog açıyoruz
   void _yeniListePenceresiAc() {
     TextEditingController listeAdiController = TextEditingController();
@@ -100,7 +114,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
                 bool basarili = await listeEkle(listeAdiController.text);
                 if (basarili) {
                   if (context.mounted) Navigator.pop(context);
-                  setState(() {});
+                  _sayfayiYenile();
                 }
               },
               style: ElevatedButton.styleFrom(
@@ -147,7 +161,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
               if (controller.text.isEmpty) return;
               bool basarili = await listeDuzenle(id, controller.text);
               if (basarili) {
-                setState(() {});
+                _sayfayiYenile();
                 if (context.mounted) Navigator.pop(context);
               }
             },
@@ -178,7 +192,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
         centerTitle: true,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: listeleriGetir(),
+        future: _listelerFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -285,7 +299,7 @@ class _AnaSayfaState extends State<AnaSayfa> {
                                     bool basarili = await listeSil(
                                       secilenListe["id"],
                                     );
-                                    if (basarili) setState(() {});
+                                    if (basarili) _sayfayiYenile();
                                   },
                                 ),
                               ],
