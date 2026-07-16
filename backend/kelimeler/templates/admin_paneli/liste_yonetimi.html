@@ -1,0 +1,113 @@
+{% extends 'admin_paneli/base_admin.html' %}
+{% load static %}
+
+{% block title %}Liste Yönetimi{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Liste Yönetimi</h1>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Yeni Liste Ekle</h6>
+    </div>
+    <div class="card-body">
+        <form id="listeEkleForm" class="form-inline">
+            <input type="text" id="yeniListeAdi" class="form-control mr-2" placeholder="Liste adı" required>
+            <button type="submit" class="btn btn-primary">Ekle</button>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Mevcut Listeler</h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Liste Adı</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for liste in listeler %}
+                <tr data-id="{{ liste.id }}">
+                    <td>{{ liste.id }}</td>
+                    <td class="liste-adi">{{ liste.name }}</td>
+                    <td>
+                        <a href="{% url 'admin_kelime_yonetimi' liste.id %}" class="btn btn-sm btn-info">Kelimeler</a>
+                        <button class="btn btn-sm btn-warning duzenle-btn">Düzenle</button>
+                        <button class="btn btn-sm btn-danger sil-btn">Sil</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(function(cookie) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            }
+        });
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+document.getElementById('listeEkleForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const isim = document.getElementById('yeniListeAdi').value;
+    fetch("{% url 'api_liste_ekle' %}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+        body: JSON.stringify({ isim: isim })
+    })
+    .then(res => res.json())
+    .then(data => { if (data.success) location.reload(); });
+});
+
+document.querySelectorAll('.sil-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        const satir = this.closest('tr');
+        const listeId = satir.dataset.id;
+        if (!confirm('Bu listeyi silmek istediğine emin misin?')) return;
+        fetch(`/api/liste/${listeId}/sil/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(res => res.json())
+        .then(data => { if (data.success) satir.remove(); });
+    });
+});
+
+document.querySelectorAll('.duzenle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        const satir = this.closest('tr');
+        const listeId = satir.dataset.id;
+        const hucre = satir.querySelector('.liste-adi');
+        const yeniAd = prompt('Yeni liste adı:', hucre.textContent.trim());
+        if (yeniAd === null) return;
+        fetch(`/api/liste/${listeId}/duzenle/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+            body: JSON.stringify({ isim: yeniAd })
+        })
+        .then(res => res.json())
+        .then(data => { if (data.success) hucre.textContent = yeniAd; });
+    });
+});
+</script>
+{% endblock %}

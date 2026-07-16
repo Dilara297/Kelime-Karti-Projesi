@@ -2,6 +2,9 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('yonetim/', views.admin_dashboard, name='admin_dashboard'),
+    path('yonetim/listeler/', views.admin_liste_yonetimi, name='admin_liste_yonetimi'),  
+    path('yonetim/listeler/<int:liste_id>/kelimeler/', views.admin_kelime_yonetimi, name='admin_kelime_yonetimi'),
     path('listeler/', views.liste_gorunumu, name='liste_gorunumu'),
     path('listeler/<int:liste_id>/', views.kelime_gorunumu, name='kelime_gorunumu'),
     path('api/kelimeler/', views.api_kelime_listesi, name='api_kelime_listesi'),
@@ -14,4 +17,5 @@ urlpatterns = [
     path('api/listeler/', views.api_listeleri_getir, name='api_listeleri_getir'),
     path('api/liste/<int:liste_id>/sil/', views.api_liste_sil, name='api_liste_sil'),
     path('api/liste/<int:liste_id>/duzenle/', views.api_liste_duzenle, name='api_liste_duzenle'),
+    
 ]

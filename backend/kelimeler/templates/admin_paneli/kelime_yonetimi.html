@@ -1,0 +1,147 @@
+{% extends 'admin_paneli/base_admin.html' %}
+{% load static %}
+
+{% block title %}{{ liste.name }} - Kelimeler{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">{{ liste.name }} - Kelime Yönetimi</h1>
+    <a href="{% url 'admin_liste_yonetimi' %}" class="btn btn-sm btn-secondary">← Listelere Dön</a>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Yeni Kelime Ekle</h6>
+    </div>
+    <div class="card-body">
+        <form id="kelimeEkleForm" class="form-row">
+            <div class="col-md-3 mb-2">
+                <input type="text" id="yeniEng" class="form-control" placeholder="İngilizce" required>
+            </div>
+            <div class="col-md-3 mb-2">
+                <input type="text" id="yeniTr" class="form-control" placeholder="Türkçe" required>
+            </div>
+            <div class="col-md-4 mb-2">
+                <input type="text" id="yeniOrnek" class="form-control" placeholder="Örnek cümle">
+            </div>
+            <div class="col-md-2 mb-2">
+                <button type="submit" class="btn btn-primary w-100">Ekle</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Kelimeler</h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>İngilizce</th>
+                    <th>Türkçe</th>
+                    <th>Örnek</th>
+                    <th>Seviye</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for kelime in kelimeler %}
+                <tr data-id="{{ kelime.id }}">
+                    <td class="k-eng">{{ kelime.eng }}</td>
+                    <td class="k-tr">{{ kelime.tr }}</td>
+                    <td class="k-example">{{ kelime.example }}</td>
+                    <td>{{ kelime.level }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning duzenle-btn">Düzenle</button>
+                        <button class="btn btn-sm btn-danger sil-btn">Sil</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie) {
+        document.cookie.split(';').forEach(function(cookie) {
+            cookie = cookie.trim();
+            if (cookie.startsWith(name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            }
+        });
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+const listeId = {{ liste.id }};
+
+document.getElementById('kelimeEkleForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    fetch("{% url 'api_kelime_ekle' %}", {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+        body: JSON.stringify({
+            liste_id: listeId,
+            eng: document.getElementById('yeniEng').value,
+            tr: document.getElementById('yeniTr').value,
+            example: document.getElementById('yeniOrnek').value
+        })
+    })
+    .then(res => res.json())
+    .then(data => { if (data.success) location.reload(); });
+});
+
+document.querySelectorAll('.sil-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        const satir = this.closest('tr');
+        const kelimeId = satir.dataset.id;
+        if (!confirm('Bu kelimeyi silmek istediğine emin misin?')) return;
+        fetch(`/api/kelime/${kelimeId}/sil/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(res => res.json())
+        .then(data => { if (data.success) satir.remove(); });
+    });
+});
+
+document.querySelectorAll('.duzenle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        const satir = this.closest('tr');
+        const kelimeId = satir.dataset.id;
+        const engHucre = satir.querySelector('.k-eng');
+        const trHucre = satir.querySelector('.k-tr');
+        const ornekHucre = satir.querySelector('.k-example');
+
+        const yeniEng = prompt('İngilizce:', engHucre.textContent.trim());
+        if (yeniEng === null) return;
+
+        const yeniTr = prompt('Türkçe:', trHucre.textContent.trim());
+        if (yeniTr === null) return;
+        const yeniOrnek = prompt('Örnek cümle:', ornekHucre.textContent.trim());
+        if (yeniOrnek === null) return;
+
+        fetch(`/api/kelime/${kelimeId}/duzenle/`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+            body: JSON.stringify({ eng: yeniEng, tr: yeniTr, example: yeniOrnek })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                engHucre.textContent = yeniEng;
+                trHucre.textContent = yeniTr;
+                ornekHucre.textContent = yeniOrnek;
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from .serializers import WordSerializer
 from datetime import timedelta
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+
+
 
 # HTML sayfaları için geçici test görünümleri (İleride silinebilir)
 def liste_gorunumu(request):
@@ -22,7 +25,7 @@ def kelime_gorunumu(request, liste_id):
             'kelimeler': kelimeler
         }
      )
-    
+
 # --- FLUTTER API ENDPOINTLERİ ---
 
 @api_view(['GET'])
@@ -137,3 +140,27 @@ def api_liste_duzenle(request, liste_id):
     liste.name = request.data.get('isim', liste.name)
     liste.save()
     return Response({'success': True})
+
+
+@login_required
+def admin_dashboard(request):
+    context = {
+        'toplam_liste': List.objects.count(),
+        'toplam_kelime': Word.objects.count(),
+    }
+    return render(request, 'admin_paneli/admin_dashboard.html', context)
+@login_required
+def admin_liste_yonetimi(request):
+    listeler = List.objects.all()
+    return render(request, 'admin_paneli/liste_yonetimi.html', {'listeler': listeler})
+
+
+@login_required
+def admin_kelime_yonetimi(request, liste_id):
+    liste = get_object_or_404(List, id=liste_id)
+    kelimeler = Word.objects.filter(liste=liste)
+    return render(request, 'admin_paneli/kelime_yonetimi.html', {
+        'liste': liste,
+        'kelimeler': kelimeler
+    }
+    )
