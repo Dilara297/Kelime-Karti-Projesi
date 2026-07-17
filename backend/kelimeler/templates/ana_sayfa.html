@@ -1,0 +1,37 @@
+{% extends 'base_kullanici.html' %}
+
+{% block title %}Anasayfa{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 50px 0;">
+
+    <div class="text-center" style="margin-bottom: 40px;">
+        <h1>Kelime Kartı Projesi'ne Hoş Geldiniz</h1>
+        <p style="font-size: 18px; color: #666;">
+            Kendi kelime listelerini oluştur, kelimeleri kartlarla ezberle,
+            tekrar sistemiyle kalıcı öğren.
+        </p>
+        <a href="{% url 'liste_gorunumu' %}" class="btn btn-primary" style="margin-top: 10px;">
+            Listelere Göz At
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body text-center">
+                    <h5 class="card-title"> Liste Oluştur</h5>
+                    <p class="card-text">İstediğin konuda kelime listeleri oluştur, kelimelerini düzenle.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card" style="margin-bottom: 20px;">
+                <div class="card-body text-center">
+                    <h5 class="card-title"> Tekrar Sistemi</h5>
+                    <p class="card-text">Bildiğin ve bilmediğin kelimeler ayrı takip edilir, tekrar zamanı otomatik hesaplanır.</p>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

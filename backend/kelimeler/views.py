@@ -164,3 +164,6 @@ def admin_kelime_yonetimi(request, liste_id):
         'kelimeler': kelimeler
     }
     )
+    
+def ana_sayfa(request):
+    return render(request, 'ana_sayfa.html')
