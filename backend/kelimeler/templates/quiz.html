@@ -1,0 +1,197 @@
+{% extends 'base_kullanici.html' %}
+{% load static %}
+
+{% block title %}{{ liste.name }} - Quiz{% endblock %}
+
+{% block content %}
+<div class="language_section layout_padding">
+   <div class="container">
+
+      <div style="text-align:center;">
+   <h1 class="language_taital">{{ liste.name }}</h1>
+   <h1 class="language_taital_1">Flashcard Quiz</h1>
+</div>
+
+      <div id="quizAlani" style="max-width:700px; margin:30px auto; text-align:center;">
+
+         <p id="sayac" style="color:#888; margin-bottom:20px; font-size:16px;"></p>
+
+         <div id="kartDisAlan" style="perspective:1200px; min-height:280px;">
+            <div id="kartIcAlan" class="box_main" style="position:relative; width:100%; min-height:280px; border-radius:16px; cursor:pointer; transition:transform 0.6s; transform-style:preserve-3d;">
+
+               <div id="kartOn" style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; backface-visibility:hidden; padding:40px;">
+                  <h2 id="kartIngilizce" class="heavy_text" style="margin-bottom:20px; font-size:36px;"></h2>
+                  <p id="kartOrnek" style="color:#444; font-style:italic; font-size:18px;"></p>
+               </div>
+
+               <div id="kartArka" style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; backface-visibility:hidden; transform:rotateY(180deg); padding:40px;">
+                  <p id="kartTurkce" style="color:#1a1a2e; font-weight:bold; font-size:32px;"></p>
+               </div>
+
+            </div>
+         </div>
+
+         <div id="biliyorumBilmiyorumAlani" style="margin-top:25px; justify-content:center; gap:15px; display:none;">
+            <button id="biliyorumBtn" class="btn btn-success" style="padding:12px 30px; font-size:16px; margin-right:15px;">Biliyorum</button>
+            <button id="bilmiyorumBtn" class="btn btn-danger" style="padding:12px 30px; font-size:16px;">Bilmiyorum</button>
+         </div>
+
+         <div style="margin-top:30px; display:flex; justify-content:center; gap:20px;">
+            <button id="geriBtn" class="btn btn-secondary" style="padding:10px 25px;">← Geri</button>
+            <button id="ileriBtn" class="btn btn-secondary" style="padding:10px 25px;">İleri →</button>
+         </div>
+
+      </div>
+
+      <div id="istatistikAlani" style="display:none; max-width:500px; margin:30px auto; text-align:center; background:#fff; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,0.12); padding:50px 30px;">
+         <h3>Quiz Bitti!</h3>
+         <p style="font-size:18px; margin-top:20px;">
+            <span style="color:darkgreen; font-weight:bold;" id="biliyorumSayisi"></span> kelime biliyordun<br>
+            <span style="color:darkred; font-weight:bold;" id="bilmiyorumSayisi"></span> kelime bilmiyordun
+         </p>
+         <a href="{% url 'liste_gorunumu' %}" class="btn btn-primary" style="margin-top:20px;">Listelere Dön</a>
+      </div>
+
+      <div class="read_bt" style="margin-top:20px;"><a href="{% url 'kelime_gorunumu' liste.id %}">Kelime Listesine Dön</a></div>
+
+   </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    const kelimeler = [
+        {% for kelime in kelimeler %}
+        {
+            id: {{ kelime.id }},
+            eng: "{{ kelime.eng|escapejs }}",
+            tr: "{{ kelime.tr|escapejs }}",
+            example: "{{ kelime.example|escapejs }}"
+        },
+        {% endfor %}
+    ];
+
+    let suankiIndeks = 0;
+    let biliyorumSayaci = 0;
+    let bilmiyorumSayaci = 0;
+    let kartCevrildi = false;
+
+    const sayacYazisi = document.getElementById('sayac');
+    const kartIngilizce = document.getElementById('kartIngilizce');
+    const kartOrnek = document.getElementById('kartOrnek');
+    const kartTurkce = document.getElementById('kartTurkce');
+    const kartIcAlan = document.getElementById('kartIcAlan');
+    const biliyorumBilmiyorumAlani = document.getElementById('biliyorumBilmiyorumAlani');
+    const istatistikAlani = document.getElementById('istatistikAlani');
+    const geriBtn = document.getElementById('geriBtn');
+    const ileriBtn = document.getElementById('ileriBtn');
+
+    function kartiGoster(anlikMi) {
+        const kelime = kelimeler[suankiIndeks];
+        sayacYazisi.textContent = (suankiIndeks + 1) + " / " + kelimeler.length;
+        kartIngilizce.textContent = kelime.eng;
+        kartOrnek.textContent = kelime.example;
+        kartTurkce.textContent = kelime.tr;
+
+        if (anlikMi) {
+            kartIcAlan.style.transition = 'none';
+        }
+        kartIcAlan.style.transform = 'rotateY(0deg)';
+        if (anlikMi) {
+            void kartIcAlan.offsetWidth; 
+            kartIcAlan.style.transition = 'transform 0.6s';
+        }
+
+        kartCevrildi = false;
+        biliyorumBilmiyorumAlani.style.display = 'none';
+        geriBtn.disabled = (suankiIndeks === 0);
+    }
+
+    function kelimeyiGuncelle(kelimeId, biliniyorMu) {
+        fetch('/api/kelime/' + kelimeId + '/guncelle/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({ known: biliniyorMu })
+        });
+    }
+
+    function quizBitir() {
+        document.getElementById('quizAlani').style.display = 'none';
+        document.getElementById('biliyorumSayisi').textContent = biliyorumSayaci;
+        document.getElementById('bilmiyorumSayisi').textContent = bilmiyorumSayaci;
+        istatistikAlani.style.display = 'block';
+    }
+
+    kartIcAlan.addEventListener('click', function () {
+        if (!kartCevrildi) {
+            kartIcAlan.style.transform = 'rotateY(180deg)';
+            kartCevrildi = true;
+            biliyorumBilmiyorumAlani.style.display = 'flex';
+        }
+    });
+
+    document.getElementById('biliyorumBtn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        const kelime = kelimeler[suankiIndeks];
+        kelimeyiGuncelle(kelime.id, true);
+        biliyorumSayaci++;
+        suankiIndeks++;
+        if (suankiIndeks >= kelimeler.length) {
+            quizBitir();
+        } else {
+            kartiGoster(true);
+        }
+    });
+
+    document.getElementById('bilmiyorumBtn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        const kelime = kelimeler[suankiIndeks];
+        kelimeyiGuncelle(kelime.id, false);
+        bilmiyorumSayaci++;
+        suankiIndeks++;
+        if (suankiIndeks >= kelimeler.length) {
+            quizBitir();
+        } else {
+            kartiGoster(true);
+        }
+    });
+
+    geriBtn.addEventListener('click', function () {
+        if (suankiIndeks > 0) {
+            suankiIndeks--;
+            kartiGoster(true);
+        }
+    });
+
+    ileriBtn.addEventListener('click', function () {
+        if (suankiIndeks < kelimeler.length - 1) {
+            suankiIndeks++;
+            kartiGoster(true);
+        }
+    });
+
+    kartiGoster(true);
+});
+</script>
+{% endblock %}

@@ -185,3 +185,11 @@ def kayit_ol(request):
 @login_required
 def profil_sayfasi(request):
     return render(request, 'profil.html')
+
+def quiz_baslat(request, liste_id):
+    liste = get_object_or_404(List, id=liste_id)
+    kelimeler = Word.objects.filter(liste=liste)
+    return render(request, 'quiz.html', {
+        'liste': liste,
+        'kelimeler': kelimeler
+    })
