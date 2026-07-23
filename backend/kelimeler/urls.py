@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('', views.ana_sayfa, name='ana_sayfa'),  
@@ -18,5 +19,8 @@ urlpatterns = [
     path('api/listeler/', views.api_listeleri_getir, name='api_listeleri_getir'),
     path('api/liste/<int:liste_id>/sil/', views.api_liste_sil, name='api_liste_sil'),
     path('api/liste/<int:liste_id>/duzenle/', views.api_liste_duzenle, name='api_liste_duzenle'),
+    path('kayit-ol/', views.kayit_ol, name='kayit_ol'),
+    path('profil/', views.profil_sayfasi, name='profil_sayfasi'),
+    path('giris-yap/', auth_views.LoginView.as_view(template_name='giris_yap.html'), name='giris_yap'),
     
 ]

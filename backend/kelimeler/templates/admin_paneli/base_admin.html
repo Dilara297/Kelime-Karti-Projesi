@@ -47,11 +47,11 @@
         <hr class="sidebar-divider" />
 
         <div class="sidebar-heading">Yönetim</div>
-<li class="nav-item">
-    <a class="nav-link" href="{% url 'admin_liste_yonetimi' %}">
-        <i class="fas fa-fw fa-list"></i><span>Liste Yönetimi</span>
-    </a>
-</li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'admin_liste_yonetimi' %}">
+            <i class="fas fa-fw fa-list"></i><span>Liste Yönetimi</span>
+          </a>
+        </li>
       </ul>
       <!-- End of Sidebar -->
 
@@ -133,7 +133,14 @@
             >
               Vazgeç
             </button>
-            <a class="btn btn-primary" href="{% url 'logout' %}">Çıkış Yap</a>
+            <form
+              method="post"
+              action="{% url 'logout' %}"
+              style="display: inline; margin: 0"
+            >
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary">Çıkış Yap</button>
+            </form>
           </div>
         </div>
       </div>

@@ -1,10 +1,13 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from .models import List, Word
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import WordSerializer
 from datetime import timedelta
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from .forms import KayitFormu
+from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 
 
@@ -167,3 +170,18 @@ def admin_kelime_yonetimi(request, liste_id):
     
 def ana_sayfa(request):
     return render(request, 'ana_sayfa.html')
+
+def kayit_ol(request):
+    if request.method == 'POST':
+        form = KayitFormu(request.POST)
+        if form.is_valid():
+            yeni_kullanici = form.save()
+            login(request, yeni_kullanici)   
+            return redirect('ana_sayfa')
+    else:
+        form = KayitFormu()
+    return render(request, 'kayit_ol.html', {'form': form})
+
+@login_required
+def profil_sayfasi(request):
+    return render(request, 'profil.html')

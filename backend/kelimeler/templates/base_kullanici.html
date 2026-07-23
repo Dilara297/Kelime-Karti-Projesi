@@ -1,101 +1,180 @@
 {% load static %}
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-   <meta charset="utf-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-   <title>{% block title %}Kelime Defteri{% endblock %}</title>
+    <title>{% block title %}Kelime Defteri{% endblock %}</title>
 
-   <meta name="keywords" content="">
-   <meta name="description" content="">
-   <meta name="author" content="">
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
 
-   <link rel="stylesheet" type="text/css" href="{% static 'kelimeler/css/bootstrap.min.css' %}">
-   <link rel="stylesheet" type="text/css" href="{% static 'kelimeler/css/style.css' %}">
-   <link rel="stylesheet" href="{% static 'kelimeler/css/responsive.css' %}">
-   <link rel="icon" href="{% static 'kelimeler/images/fevicon.png' %}" type="image/gif">
-   <link rel="stylesheet" href="{% static 'kelimeler/css/jquery.mCustomScrollbar.min.css' %}">
-   <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-   <link rel="stylesheet" href="{% static 'kelimeler/css/owl.carousel.min.css' %}">
-   <link rel="stylesheet" href="{% static 'kelimeler/css/owl.theme.default.min.css' %}">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
-</head>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'kelimeler/css/bootstrap.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'kelimeler/css/style.css' %}"
+    />
+    <link rel="stylesheet" href="{% static 'kelimeler/css/responsive.css' %}" />
+    <link
+      rel="icon"
+      href="{% static 'kelimeler/images/fevicon.png' %}"
+      type="image/gif"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'kelimeler/css/jquery.mCustomScrollbar.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'kelimeler/css/owl.carousel.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="{% static 'kelimeler/css/owl.theme.default.min.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css"
+    />
+  </head>
 
-<body>
-
-<div class="header_section">
-
-   <div class="container-fluid">
-
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-
-         <div class="logo">
+  <body>
+    <div class="header_section">
+      <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="logo">
             <a href="{% url 'liste_gorunumu' %}">
-               <img src="{% static 'kelimeler/images/logo.png' %}">
+              <img src="{% static 'kelimeler/images/logo.png' %}" />
             </a>
-         </div>
+          </div>
 
-         <button class="navbar-toggler"
-                 type="button"
-                 data-toggle="collapse"
-                 data-target="#navbarSupportedContent">
-
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+          >
             <span class="navbar-toggler-icon"></span>
+          </button>
 
-         </button>
-
-         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="{% url 'liste_gorunumu' %}">
+                  Ana Sayfa
+                </a>
+              </li>
 
-               <li class="nav-item active">
-                  <a class="nav-link" href="{% url 'liste_gorunumu' %}">
-                     Ana Sayfa
-                  </a>
-               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'admin_dashboard' %}">
+                  Admin
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'profil_sayfasi' %}">
+                  Profilim
+                </a>
+              </li>
 
-             <li class="nav-item">
-   <a class="nav-link" href="{% url 'admin_dashboard' %}">
-      Admin
-   </a>
-</li>
-
-               <li class="nav-item">
-                  <a class="nav-link" href="/api/kelimeler/">
-                     API
-                  </a>
-               </li>
-
+              <li class="nav-item">
+                <a class="nav-link" href="/api/kelimeler/"> API </a>
+              </li>
             </ul>
+            <ul class="navbar-nav ml-auto">
+              {% if user.is_authenticated %}
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  id="profilDropdown"
+                  role="button"
+                  data-toggle="dropdown"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <span
+                    style="
+                      display: inline-block;
+                      width: 32px;
+                      height: 32px;
+                      border-radius: 50%;
+                      background-color: #4e73df;
+                      color: white;
+                      text-align: center;
+                      line-height: 32px;
+                    "
+                  >
+                    {{ user.username|first|upper }}
+                  </span>
+                </a>
+                <div
+                  class="dropdown-menu dropdown-menu-right"
+                  aria-labelledby="profilDropdown"
+                >
+                  <a class="dropdown-item" href="{% url 'profil_sayfasi' %}"
+                    >Profilim</a
+                  >
+                  <form
+                    method="post"
+                    action="{% url 'logout' %}"
+                    style="margin: 0; padding: 0"
+                  >
+                    {% csrf_token %}
+                    <button
+                      type="submit"
+                      class="dropdown-item"
+                      style="
+                        background: none;
+                        border: none;
+                        width: 100%;
+                        text-align: left;
+                      "
+                    >
+                      Çıkış Yap
+                    </button>
+                  </form>
+                </div>
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'giris_yap' %}">Giriş Yap</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'kayit_ol' %}">Kayıt Ol</a>
+              </li>
+              {% endif %}
+            </ul>
+          </div>
+        </nav>
+      </div>
 
-         </div>
+      {% block banner %} {% endblock %}
+    </div>
 
-      </nav>
+    {% block content %} {% endblock %}
 
-   </div>
+    <script src="{% static 'kelimeler/js/jquery.min.js' %}"></script>
+    <script src="{% static 'kelimeler/js/popper.min.js' %}"></script>
+    <script src="{% static 'kelimeler/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'kelimeler/js/jquery-3.0.0.min.js' %}"></script>
+    <script src="{% static 'kelimeler/js/plugin.js' %}"></script>
+    <script src="{% static 'kelimeler/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
+    <script src="{% static 'kelimeler/js/custom.js' %}"></script>
+    <script src="{% static 'kelimeler/js/owl.carousel.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
 
-   {% block banner %}
-   {% endblock %}
-
-</div>
-
-{% block content %}
-{% endblock %}
-
-<script src="{% static 'kelimeler/js/jquery.min.js' %}"></script>
-<script src="{% static 'kelimeler/js/popper.min.js' %}"></script>
-<script src="{% static 'kelimeler/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'kelimeler/js/jquery-3.0.0.min.js' %}"></script>
-<script src="{% static 'kelimeler/js/plugin.js' %}"></script>
-<script src="{% static 'kelimeler/js/jquery.mCustomScrollbar.concat.min.js' %}"></script>
-<script src="{% static 'kelimeler/js/custom.js' %}"></script>
-<script src="{% static 'kelimeler/js/owl.carousel.js' %}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
-
-{% block extra_js %}
-{% endblock %}
-
-</body>
+    {% block extra_js %} {% endblock %}
+  </body>
 </html>
