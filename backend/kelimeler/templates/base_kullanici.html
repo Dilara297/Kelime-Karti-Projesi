@@ -78,18 +78,14 @@
               </li>
 
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'admin_dashboard' %}">
-                  Admin
-                </a>
+                {% if user.is_staff %}
+                <a class="nav-link" href="{% url 'admin_dashboard' %}">Admin</a>
+                {% endif %}
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'profil_sayfasi' %}">
                   Profilim
                 </a>
-              </li>
-
-              <li class="nav-item">
-                <a class="nav-link" href="/api/kelimeler/"> API </a>
               </li>
             </ul>
             <ul class="navbar-nav ml-auto">
@@ -104,20 +100,10 @@
                   aria-haspopup="true"
                   aria-expanded="false"
                 >
-                  <span
-                    style="
-                      display: inline-block;
-                      width: 32px;
-                      height: 32px;
-                      border-radius: 50%;
-                      background-color: #4e73df;
-                      color: white;
-                      text-align: center;
-                      line-height: 32px;
-                    "
-                  >
-                    {{ user.username|first|upper }}
-                  </span>
+                  <span style="display:inline-block; width:32px; height:32px; border-radius:50%;
+             background-color:#191970; color:#ddc24e; text-align:center; line-height:32px; font-weight:bold;">
+   {{ user.username|first|upper }}
+</span>
                 </a>
                 <div
                   class="dropdown-menu dropdown-menu-right"

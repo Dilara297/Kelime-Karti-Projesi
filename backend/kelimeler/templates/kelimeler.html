@@ -9,7 +9,7 @@
          <div class="container">
             <h1 class="language_taital">{{ liste.name }}</h1>
             <h1 class="language_taital_1">Listedeki Kelimeler</h1>
-            
+
             <div class="read_bt">
                 <a href="{% url 'quiz_baslat' liste.id %}">
                      Quiz Başlat
@@ -32,6 +32,20 @@
                   {% endfor %}
                </div>
             </div>
+        {% if duzenleme_yetkisi %}
+        <div style="position:static !important; float:none !important; clear:both !important; display:block !important; width:100% !important; max-width:600px; margin:0 auto !important; padding-top:60px !important; box-sizing:border-box;">
+   <div style="background:#ddc24e; border-radius:16px; padding:30px; box-shadow:0 2px 10px rgba(0,0,0,0.15);">
+   <h6 style="margin-bottom:15px; color:#1a1a2e; font-weight:bold;">Yeni Kelime Ekle</h6>
+   <form id="kelimeEkleForm" style="display:flex; flex-wrap:wrap; gap:10px;">
+      <input type="text" id="yeniEng" placeholder="İngilizce" required style="flex:1; min-width:120px; padding:8px 12px; border:none; border-radius:6px; box-sizing:border-box;">
+      <input type="text" id="yeniTr" placeholder="Türkçe" required style="flex:1; min-width:120px; padding:8px 12px; border:none; border-radius:6px; box-sizing:border-box;">
+      <input type="text" id="yeniOrnek" placeholder="Örnek cümle" style="flex:2; min-width:150px; padding:8px 12px; border:none; border-radius:6px; box-sizing:border-box;">
+      <button type="submit" style="background:#1a1a2e; color:#fff; border:none; padding:8px 20px; border-radius:23px; white-space:nowrap; cursor:pointer;">Ekle</button>
+   </form>
+</div>
+            </div>
+        {% endif %}
+
             <div class="read_bt"><a href="{% url 'liste_gorunumu' %}">Geri Dön</a></div>
          </div>
       </div>
@@ -98,6 +112,79 @@ document.addEventListener('DOMContentLoaded', function () {
             kelimeyiGuncelle(kelimeId, false, kart);
         });
     });
+
+const kelimeEkleForm = document.getElementById('kelimeEkleForm');
+    if (kelimeEkleForm) {
+        kelimeEkleForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            fetch("{% url 'api_kelime_ekle' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+                body: JSON.stringify({
+                    liste_id: {{ liste.id }},
+                    eng: document.getElementById('yeniEng').value,
+                    tr: document.getElementById('yeniTr').value,
+                    example: document.getElementById('yeniOrnek').value
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.hata || 'Bir hata oluştu');
+                }
+            });
+        });
+    }
+
+    document.querySelectorAll('.kelime-sil-bt').forEach(function (buton) {
+        buton.addEventListener('click', function () {
+            const kart = buton.closest('.box_main');
+            const kelimeId = kart.getAttribute('data-kelime-id');
+            if (!confirm('Bu kelimeyi silmek istediğine emin misin?')) return;
+            fetch('/api/kelime/' + kelimeId + '/sil/', {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrftoken }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    kart.closest('.col-lg-4').remove();
+                } else {
+                    alert(data.hata || 'Bir hata oluştu');
+                }
+            });
+        });
+    });
+
+    document.querySelectorAll('.kelime-duzenle-bt').forEach(function (buton) {
+        buton.addEventListener('click', function () {
+            const kart = buton.closest('.box_main');
+            const kelimeId = kart.getAttribute('data-kelime-id');
+            const yeniEng = prompt('İngilizce:');
+            if (yeniEng === null) return;
+            const yeniTr = prompt('Türkçe:');
+            if (yeniTr === null) return;
+            const yeniOrnek = prompt('Örnek cümle:');
+            if (yeniOrnek === null) return;
+
+            fetch('/api/kelime/' + kelimeId + '/duzenle/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+                body: JSON.stringify({ eng: yeniEng, tr: yeniTr, example: yeniOrnek })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.hata || 'Bir hata oluştu');
+                }
+            });
+        });
+    });
+
 });
 </script>
 {% endblock %}

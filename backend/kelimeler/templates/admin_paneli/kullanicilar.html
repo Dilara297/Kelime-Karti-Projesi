@@ -1,0 +1,46 @@
+{% extends 'admin_paneli/base_admin.html' %}
+{% load static %}
+
+{% block title %}Kullanıcılar{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Kullanıcılar</h1>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Tüm Kullanıcılar ({{ kullanicilar.count }})</h6>
+    </div>
+    <div class="card-body">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Kullanıcı Adı</th>
+                    <th>E-posta</th>
+                    <th>Kayıt Tarihi</th>
+                    <th>Yetki</th>
+                    <th>Liste Sayısı</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for kullanici in kullanicilar %}
+                <tr>
+                    <td>{{ kullanici.username }}</td>
+                    <td>{{ kullanici.email }}</td>
+                    <td>{{ kullanici.date_joined|date:"d.m.Y H:i" }}</td>
+                    <td>
+                        {% if kullanici.is_staff %}
+                        <span class="badge badge-success">Admin</span>
+                        {% else %}
+                        <span class="badge badge-secondary">Kullanıcı</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ kullanici.listeler.count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
