@@ -10,11 +10,13 @@
             <h1 class="language_taital">{{ liste.name }}</h1>
             <h1 class="language_taital_1">Listedeki Kelimeler</h1>
 
+            {% if kelimeler %}    
             <div class="read_bt">
                 <a href="{% url 'quiz_baslat' liste.id %}">
                      Quiz Başlat
                 </a>
             </div>
+            {% endif %}
             <div class="language_section_2 layout_padding">
                <div class="row">
                   {% for kelime in kelimeler %}
